@@ -104,6 +104,130 @@ class Series {
 
         return response.data;
     }
+
+
+    /**
+     * シリーズ名を変更する
+     * @param series_id シリーズ ID
+     * @param title 変更後のシリーズタイトル
+     * @returns 更新後のシリーズ情報 or 変更に失敗した場合は null
+     */
+    static async updateSeries(series_id: number, title: string): Promise<ISeries | null> {
+
+        // API リクエストを実行
+        const response = await APIClient.put<ISeries>(`/series/${series_id}`, { title });
+
+        // エラー処理
+        if (response.type === 'error') {
+            APIClient.showGenericError(response, 'シリーズ名の変更に失敗しました。');
+            return null;
+        }
+
+        return response.data;
+    }
+
+
+    /**
+     * シリーズから録画番組を除外する
+     * @param series_id シリーズ ID
+     * @param program_id 除外する録画番組の ID
+     * @returns 除外に成功した場合は true、失敗した場合は false
+     */
+    static async removeProgramFromSeries(series_id: number, program_id: number): Promise<boolean> {
+
+        // API リクエストを実行
+        const response = await APIClient.delete(`/series/${series_id}/programs/${program_id}`);
+
+        // エラー処理
+        if (response.type === 'error') {
+            APIClient.showGenericError(response, 'シリーズからの除外に失敗しました。');
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 新しいシリーズを作成する
+     * @param title シリーズのタイトル
+     * @returns 作成されたシリーズ情報 or 作成に失敗した場合は null
+     */
+    static async createSeries(title: string): Promise<ISeries | null> {
+
+        // API リクエストを実行
+        const response = await APIClient.post<ISeries>('/series', { title });
+
+        // エラー処理
+        if (response.type === 'error') {
+            APIClient.showGenericError(response, 'シリーズの作成に失敗しました。');
+            return null;
+        }
+
+        return response.data;
+    }
+
+
+    /**
+     * シリーズを削除する
+     * @param series_id シリーズ ID
+     * @returns 削除に成功した場合は true、失敗した場合は false
+     */
+    static async deleteSeries(series_id: number): Promise<boolean> {
+
+        // API リクエストを実行
+        const response = await APIClient.delete(`/series/${series_id}`);
+
+        // エラー処理
+        if (response.type === 'error') {
+            APIClient.showGenericError(response, 'シリーズの削除に失敗しました。');
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * シリーズに録画番組を追加する
+     * @param series_id シリーズ ID
+     * @param program_id 追加する録画番組の ID
+     * @returns 更新後のシリーズ情報 or 追加に失敗した場合は null
+     */
+    static async addProgramToSeries(series_id: number, program_id: number): Promise<ISeries | null> {
+
+        // API リクエストを実行
+        const response = await APIClient.post<ISeries>(`/series/${series_id}/programs/${program_id}`);
+
+        // エラー処理
+        if (response.type === 'error') {
+            APIClient.showGenericError(response, 'シリーズへの追加に失敗しました。');
+            return null;
+        }
+
+        return response.data;
+    }
+
+
+    /**
+     * シリーズをマージする (マージ元の全番組をマージ先に移動)
+     * @param source_id マージ元シリーズ ID
+     * @param target_id マージ先シリーズ ID
+     * @returns マージ後のターゲットシリーズ情報 or マージに失敗した場合は null
+     */
+    static async mergeSeries(source_id: number, target_id: number): Promise<ISeries | null> {
+
+        // API リクエストを実行
+        const response = await APIClient.post<ISeries>(`/series/${source_id}/merge/${target_id}`);
+
+        // エラー処理
+        if (response.type === 'error') {
+            APIClient.showGenericError(response, 'シリーズのマージに失敗しました。');
+            return null;
+        }
+
+        return response.data;
+    }
 }
 
 export default Series;

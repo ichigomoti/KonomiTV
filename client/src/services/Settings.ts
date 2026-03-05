@@ -114,6 +114,7 @@ export interface IServerSettings {
     };
     server: {
         port: number;
+        require_login: boolean;
         custom_https_certificate: string | null;
         custom_https_private_key: string | null;
     };
@@ -145,6 +146,7 @@ export const IServerSettingsDefault: IServerSettings = {
     },
     server: {
         port: 7000,
+        require_login: false,
         custom_https_certificate: null,
         custom_https_private_key: null,
     },

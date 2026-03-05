@@ -51,7 +51,6 @@
                             <span class="comment__time">{{item.time}}</span>
                             <!-- なぜか @click だとスマホで発火しないので @touchend にしている -->
                             <div class="comment__icon" v-ripple="!Utils.isTouchDevice()"
-                                @click.stop
                                 @mouseup="showCommentListDropdown($event, item)"
                                 @touchend="showCommentListDropdown($event, item)">
                                 <!-- Icon コンポーネントを使うと個数が多いときに高負荷になるため、意図的に SVG を直書きしている -->
@@ -72,7 +71,6 @@
                         <span class="comment__time">{{item.time}}</span>
                         <!-- なぜか @click だとスマホで発火しないので @touchend にしている -->
                         <div class="comment__icon" v-ripple="!Utils.isTouchDevice()"
-                            @click.stop
                             @mouseup="showCommentListDropdown($event, item)"
                             @touchend="showCommentListDropdown($event, item)">
                             <!-- Icon コンポーネントを使うと個数が多いときに高負荷になるため、意図的に SVG を直書きしている -->

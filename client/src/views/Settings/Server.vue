@@ -126,6 +126,16 @@
                     v-model="server_settings.server.port">
                 </v-text-field>
             </div>
+            <div class="settings__item settings__item--switch">
+                <label class="settings__item-heading" for="require_login">ログインを必須にする</label>
+                <label class="settings__item-label" for="require_login">
+                    有効にすると、KonomiTV にアクセスする際にログインが必要になります。<br>
+                    無効の場合、ログインしなくてもすべての機能を利用できます。<br>
+                </label>
+                <v-switch class="settings__item-switch" color="primary" id="require_login" hide-details
+                    v-model="server_settings.server.require_login">
+                </v-switch>
+            </div>
             <div class="settings__item">
                 <div class="settings__item-heading">HTTPS リバースプロキシのカスタム HTTPS 証明書/秘密鍵ファイルへの絶対パス</div>
                 <div class="settings__item-label">

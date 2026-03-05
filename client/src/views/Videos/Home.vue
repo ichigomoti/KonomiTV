@@ -23,6 +23,59 @@
                         :isLoading="is_loading"
                         :showEmptyMessage="!is_loading"
                         @more="$router.push('/videos/programs')" />
+                    <!-- シリーズ一覧 -->
+                    <div class="series-section">
+                        <div class="series-section__header">
+                            <h2 class="series-section__title">
+                                <span class="series-section__title-text">シリーズ</span>
+                            </h2>
+                            <div class="series-section__actions">
+                                <v-btn variant="text" class="series-section__more"
+                                    @click="$router.push('/videos/series')">
+                                    <span class="text-primary">もっと見る</span>
+                                    <Icon icon="fluent:chevron-right-12-regular" width="18px"
+                                        class="ml-1 text-text-darken-1" style="margin: 0px -4px;" />
+                                </v-btn>
+                            </div>
+                        </div>
+                        <div class="series-section__grid">
+                            <!-- シリーズが存在する場合: カードリスト表示 -->
+                            <div class="series-section__grid-content" v-if="recent_series.length > 0">
+                                <router-link class="series-section__card" v-for="s in recent_series" :key="s.id"
+                                    :to="`/videos/series/${s.id}`">
+                                    <div class="series-section__card-thumbnail">
+                                        <img v-if="getLatestProgram(s)" loading="lazy"
+                                            :src="`${Utils.api_base_url}/videos/${getLatestProgram(s)!.id}/thumbnail`" />
+                                        <span class="series-section__card-badge">
+                                            {{ getTotalEpisodeCount(s) }}件
+                                        </span>
+                                    </div>
+                                    <div class="series-section__card-content">
+                                        <span class="series-section__card-title">{{ s.title }}</span>
+                                        <div class="series-section__card-meta">
+                                            <span class="series-section__card-channel" v-if="getLatestPeriod(s)">
+                                                {{ getLatestPeriod(s)!.channel.name }}
+                                            </span>
+                                            <span class="series-section__card-genres" v-if="s.genres.length > 0">
+                                                {{ s.genres.map(g => g.major).join(' / ') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </router-link>
+                            </div>
+                            <!-- シリーズが存在しない場合: 空状態メッセージ -->
+                            <div class="series-section__empty" v-else-if="!is_loading">
+                                <div class="series-section__empty-content">
+                                    <Icon class="series-section__empty-icon" icon="fluent:video-clip-multiple-16-regular"
+                                        width="54px" height="54px" />
+                                    <h2>シリーズ番組がまだありません。</h2>
+                                    <div class="series-section__empty-sub">
+                                        録画番組のスキャン完了後に<br class="d-sm-none">自動的に表示されます。
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <RecordedProgramList
                         title="マイリスト"
                         :programs="mylist_programs"
@@ -65,14 +118,20 @@ import HeaderBar from '@/components/HeaderBar.vue';
 import Navigation from '@/components/Navigation.vue';
 import SPHeaderBar from '@/components/SPHeaderBar.vue';
 import RecordedProgramList from '@/components/Videos/RecordedProgramList.vue';
+import SeriesService, { ISeries } from '@/services/Series';
 import { IRecordedProgram } from '@/services/Videos';
 import Videos from '@/services/Videos';
 import useSettingsStore from '@/stores/SettingsStore';
 import useUserStore from '@/stores/UserStore';
+import Utils from '@/utils';
 
 // 最近録画された番組のリスト
 const recent_programs = ref<IRecordedProgram[]>([]);
 const total_programs = ref(0);
+
+// シリーズのリスト
+const recent_series = ref<ISeries[]>([]);
+const total_series = ref(0);
 
 // マイリストの録画番組のリスト
 const mylist_programs = ref<IRecordedProgram[]>([]);
@@ -108,6 +167,35 @@ const fetchRecentPrograms = async () => {
         recent_programs.value = result.recorded_programs.slice(0, 10);  // 最新10件のみ表示
         total_programs.value = result.total;
     }
+};
+
+// シリーズ一覧を取得 (最新4件)
+const fetchRecentSeries = async () => {
+    const result = await SeriesService.fetchSeriesList('desc', 1);
+    if (result) {
+        recent_series.value = result.series_list.slice(0, 4);
+        total_series.value = result.total;
+    }
+};
+
+// シリーズの最新放送期間を取得する
+const getLatestPeriod = (s: ISeries) => {
+    if (s.broadcast_periods.length === 0) return null;
+    return s.broadcast_periods[s.broadcast_periods.length - 1];
+};
+
+// シリーズの最新エピソード (サムネイル用) を取得する
+const getLatestProgram = (s: ISeries) => {
+    const period = getLatestPeriod(s);
+    if (!period || period.recorded_programs.length === 0) return null;
+    return period.recorded_programs[period.recorded_programs.length - 1];
+};
+
+// シリーズの全エピソード数を算出する
+const getTotalEpisodeCount = (s: ISeries): number => {
+    return s.broadcast_periods.reduce(
+        (sum, period) => sum + period.recorded_programs.length, 0,
+    );
 };
 
 // マイリストの録画番組を取得
@@ -158,6 +246,7 @@ const fetchWatchedPrograms = async () => {
 // 各セクションの更新関数を管理するオブジェクト
 const sectionUpdaters = {
     recentPrograms: fetchRecentPrograms,
+    recentSeries: fetchRecentSeries,
     mylistPrograms: fetchMylistPrograms,
     watchedPrograms: fetchWatchedPrograms,
 } as const;
@@ -251,6 +340,204 @@ onUnmounted(() => {
             height: calc(125px * 10);
             @include smartphone-vertical {
                 height: calc(100px * 10);
+            }
+        }
+    }
+}
+
+// シリーズセクション (RecordedProgramList のヘッダーパターンに準拠)
+.series-section {
+    margin-top: 28px;
+    @include smartphone-vertical {
+        margin-top: 16px;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        @include smartphone-vertical {
+            padding: 0px 8px;
+        }
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        position: relative;
+        font-size: 24px;
+        font-weight: 700;
+        padding-top: 8px;
+        padding-bottom: 20px;
+        @include smartphone-vertical {
+            font-size: 22px;
+            padding-bottom: 16px;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
+
+    &__more {
+        margin-bottom: 12px;
+        padding: 0px 10px;
+        font-size: 15px;
+        letter-spacing: 0.05em;
+        @include smartphone-vertical {
+            margin-bottom: 6px;
+        }
+    }
+
+    // シリーズカードグリッド (RecordedProgramList の __grid パターンに準拠)
+    &__grid {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        width: 100%;
+        min-height: 200px;
+        background: rgb(var(--v-theme-background-lighten-1));
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    &__grid-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    // シリーズカード (Series.vue の横長カードと同じパターン)
+    &__card {
+        display: flex;
+        width: 100%;
+        height: 125px;
+        padding: 0px 16px;
+        text-decoration: none;
+        color: rgb(var(--v-theme-text));
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        @include smartphone-vertical {
+            height: auto;
+            padding: 0px 9px;
+        }
+
+        &:hover {
+            background-color: rgb(var(--v-theme-background-lighten-2));
+        }
+
+        & + .series-section__card {
+            border-top: 1px solid rgb(var(--v-theme-background));
+        }
+    }
+
+    &__card-thumbnail {
+        position: relative;
+        flex-shrink: 0;
+        width: 178px;
+        aspect-ratio: 16 / 9;
+        margin: 12px 0;
+        border-radius: 5px;
+        overflow: hidden;
+        background: linear-gradient(150deg, rgb(var(--v-theme-gray)), rgb(var(--v-theme-background-lighten-2)));
+        @include smartphone-vertical {
+            width: 130px;
+            margin: 9px 0;
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__card-badge {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.75);
+        color: #ffffff;
+        font-size: 11.5px;
+        font-weight: 600;
+    }
+
+    &__card-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        padding: 12px 14px;
+        min-width: 0;
+        flex: 1;
+        @include smartphone-vertical {
+            padding: 9px 10px;
+        }
+    }
+
+    &__card-title {
+        font-size: 15px;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @include smartphone-vertical {
+            font-size: 14px;
+            white-space: normal;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    }
+
+    &__card-meta {
+        display: flex;
+        gap: 8px;
+        font-size: 12.5px;
+        color: rgb(var(--v-theme-text-darken-1));
+    }
+
+    &__card-channel {
+        font-weight: 500;
+    }
+
+    // シリーズが0件の場合の空状態表示 (RecordedProgramList の __empty パターンに準拠)
+    &__empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding-top: 28px;
+        padding-bottom: 40px;
+        flex-grow: 1;
+        text-align: center;
+
+        &-icon {
+            color: rgb(var(--v-theme-text-darken-1));
+        }
+
+        h2 {
+            font-size: 21px;
+            @include smartphone-vertical {
+                font-size: 19px !important;
+                text-align: center;
+            }
+        }
+
+        &-sub {
+            margin-top: 8px;
+            color: rgb(var(--v-theme-text-darken-1));
+            font-size: 15px;
+            @include smartphone-vertical {
+                font-size: 13px !important;
+                text-align: center;
+                margin-top: 7px !important;
+                line-height: 1.65;
             }
         }
     }

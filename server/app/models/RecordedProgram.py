@@ -47,6 +47,9 @@ class RecordedProgram(TortoiseModel):
     series_title = cast(TortoiseField[str | None], fields.TextField(null=True))
     episode_number = cast(TortoiseField[str | None], fields.CharField(255, null=True))
     subtitle = cast(TortoiseField[str | None], fields.TextField(null=True))
+    # 手動でシリーズ割り当てを編集した場合に True になるフラグ
+    # True の場合、__batchAssignSeries() による自動再割り当てをスキップする
+    is_series_manually_edited = fields.BooleanField(default=False)
     description = fields.TextField()
     detail = cast(TortoiseField[dict[str, str]], fields.JSONField(default={}, encoder=lambda x: json.dumps(x, ensure_ascii=False)))  # type: ignore
     start_time = fields.DatetimeField()

@@ -64,7 +64,8 @@
             </div>
             <div class="recorded-program-list__grid-content">
                 <RecordedProgram v-for="program in displayPrograms" :key="program.id" :program="program"
-                    :forMylist="forMylist" :forWatchedHistory="forWatchedHistory" @deleted="handleProgramDeleted" />
+                    :forMylist="forMylist" :forWatchedHistory="forWatchedHistory" :forSeries="forSeries" :seriesId="seriesId"
+                    @deleted="handleProgramDeleted" @removedFromSeries="handleProgramRemovedFromSeries" />
             </div>
         </div>
         <div class="recorded-program-list__pagination" v-if="!hidePagination && displayTotal > 0">
@@ -110,6 +111,8 @@ const props = withDefaults(defineProps<{
     isSearching?: boolean;
     forMylist?: boolean;
     forWatchedHistory?: boolean;
+    forSeries?: boolean;
+    seriesId?: number;
 }>(), {
     page: 1,
     sortOrder: 'desc',
@@ -126,13 +129,16 @@ const props = withDefaults(defineProps<{
     isSearching: false,
     forMylist: false,
     forWatchedHistory: false,
+    forSeries: false,
+    seriesId: 0,
 });
 
 // Emits
-defineEmits<{
+const emit = defineEmits<{
     (e: 'update:page', page: number): void;
     (e: 'update:sortOrder', order: SortOrder | MylistSortOrder): void;
     (e: 'more'): void;
+    (e: 'removedFromSeries', id: number): void;
 }>();
 
 // 現在のページ番号
@@ -172,6 +178,16 @@ const handleProgramDeleted = (id: number) => {
     displayPrograms.value = displayPrograms.value.filter(program => program.id !== id);
     // 合計数を1減らす
     displayTotal.value--;
+};
+
+// シリーズから除外された時の処理
+const handleProgramRemovedFromSeries = (id: number) => {
+    // 内部のプログラムリストから除外されたプログラムを除去
+    displayPrograms.value = displayPrograms.value.filter(program => program.id !== id);
+    // 合計数を1減らす
+    displayTotal.value--;
+    // 親コンポーネントにイベントを伝播
+    emit('removedFromSeries', id);
 };
 
 </script>

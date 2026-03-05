@@ -76,9 +76,10 @@ export default defineComponent({
         // アカウント情報を更新
         await this.userStore.fetchUser();
 
-        // 現在ログイン中の場合はアカウントページに遷移
+        // 現在ログイン中の場合、リダイレクト先があればそこに遷移し、なければアカウントページに遷移
         if (this.userStore.is_logged_in) {
-            await this.$router.replace({path: '/settings/account'});
+            const redirect = this.$route.query.redirect as string;
+            await this.$router.replace(redirect || '/settings/account');
         }
     },
     methods: {
@@ -96,9 +97,10 @@ export default defineComponent({
                 return;  // ログイン失敗
             }
 
-            // アカウントページに遷移
+            // リダイレクト先があればそこに遷移し、なければアカウントページに遷移
             // ブラウザバックでログインページに戻れないようにする
-            await this.$router.replace({path: '/settings/account'});
+            const redirect = this.$route.query.redirect as string;
+            await this.$router.replace(redirect || '/settings/account');
         }
     }
 });

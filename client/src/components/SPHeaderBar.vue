@@ -50,14 +50,17 @@ const isSearchActive = ref(false);
 const searchQuery = ref('');
 
 // 検索ボタンの表示判定
-// 番組表ページでは検索ボタンは表示するが、設定/ログイン/登録/キャプチャページでは非表示
+// 設定/ログイン/登録ページでは非表示
 const showSearchButton = computed(() => {
     const path = route.path;
-    return !path.startsWith('/captures') && !path.startsWith('/settings') && !path.startsWith('/login') && !path.startsWith('/register');
+    return !path.startsWith('/settings') && !path.startsWith('/login') && !path.startsWith('/register');
 });
 
 // 検索プレースホルダー
 const searchPlaceholder = computed(() => {
+    if (route.path.startsWith('/captures')) {
+        return 'キャプチャを番組名やチャンネル名で検索...';
+    }
     return isVideoSection(route.path)
         ? '録画番組やシリーズを検索...'
         : '放送予定の番組を検索...';
@@ -72,6 +75,9 @@ const isVideoSection = (path: string) => {
 
 // 検索パスを取得
 const getSearchPath = () => {
+    if (route.path.startsWith('/captures')) {
+        return '/captures/search';
+    }
     return isVideoSection(route.path)
         ? '/videos/search'
         : '/tv/search';

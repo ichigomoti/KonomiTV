@@ -50,9 +50,6 @@ export default defineComponent({
 
             // 録画再生時の再生位置 (秒)
             playback_position: 0,
-
-            // setTimeout の ID (beforeUnmount でクリアするために保持)
-            update_time_timer_id: 0 as ReturnType<typeof setTimeout> | number,
         };
     },
     computed: {
@@ -98,17 +95,17 @@ export default defineComponent({
                 return ms > 800 ? 500 : 1000 - ms;
             }
         },
-        updateTime() {
-            this.update_time_timer_id = setTimeout(() => {
-                this.updateTime();
+        uptimeTime() {
+            setTimeout(() => {
+                this.uptimeTime();
             }, this.updateTimeCore());
         },
     },
     created() {
         // 初期表示の時刻を設定
         this.time = this.formatTime(dayjs());
-        this.update_time_timer_id = setTimeout(() => {
-            this.updateTime();
+        setTimeout(() => {
+            this.uptimeTime();
         }, 1000);
 
         // 録画再生時: 再生位置が変更されたときに playback_position を更新
@@ -121,7 +118,7 @@ export default defineComponent({
         });
     },
     beforeUnmount() {
-        clearTimeout(this.update_time_timer_id);
+        this.uptimeTime = ()=>{ };
     },
 });
 

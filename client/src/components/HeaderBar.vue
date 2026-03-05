@@ -48,12 +48,18 @@ onMounted(() => {
 watch(() => route.fullPath, initializeSearchQuery);
 
 const searchPlaceholder = computed(() => {
+    if (route.path.startsWith('/captures')) {
+        return 'キャプチャを番組名やチャンネル名で検索...';
+    }
     return route.path.startsWith('/videos') || route.path.startsWith('/mylist') || route.path.startsWith('/watched-history')
         ? '録画番組を検索...'
         : '放送予定の番組を検索...';
 });
 
 const getSearchPath = () => {
+    if (route.path.startsWith('/captures')) {
+        return '/captures/search';
+    }
     return route.path.startsWith('/videos') || route.path.startsWith('/mylist') || route.path.startsWith('/watched-history')
         ? '/videos/search'
         : '/tv/search';
@@ -74,7 +80,7 @@ const doSearch = () => {
 
 const showSearchInput = computed(() => {
     const path = route.path;
-    return !path.startsWith('/captures') && !path.startsWith('/settings') && !path.startsWith('/login') && !path.startsWith('/register');
+    return !path.startsWith('/settings') && !path.startsWith('/login') && !path.startsWith('/register');
 });
 
 // 番組表ページかどうか（ヘッダーにコントロールが多くスペースに余裕がないため、PWA インストールボタンを非表示にする）

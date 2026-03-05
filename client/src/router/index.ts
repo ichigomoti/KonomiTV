@@ -2,6 +2,8 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
+import Settings from '@/services/Settings';
+import useUserStore from '@/stores/UserStore';
 import Utils from '@/utils';
 
 
@@ -45,6 +47,16 @@ const router = createRouter({
             component: () => import('@/views/Videos/Programs.vue'),
         },
         {
+            path: '/videos/series',
+            name: 'Videos Series',
+            component: () => import('@/views/Videos/Series.vue'),
+        },
+        {
+            path: '/videos/series/:series_id',
+            name: 'Videos Series Detail',
+            component: () => import('@/views/Videos/SeriesDetail.vue'),
+        },
+        {
             path: '/videos/watch/:video_id',
             name: 'Videos Watch',
             component: () => import('@/views/Videos/Watch.vue'),
@@ -63,6 +75,21 @@ const router = createRouter({
             path: '/reservations/all',
             name: 'Reservations All',
             component: () => import('@/views/Reservations/Reservations.vue'),
+        },
+        {
+            path: '/captures/',
+            name: 'Captures',
+            component: () => import('@/views/Captures.vue'),
+        },
+        {
+            path: '/captures/search',
+            name: 'Captures Search',
+            component: () => import('@/views/Captures.vue'),
+        },
+        {
+            path: '/captures/folders/:folder_id',
+            name: 'Captures Folder',
+            component: () => import('@/views/Captures.vue'),
         },
         {
             path: '/mylist/',
@@ -165,6 +192,48 @@ const router = createRouter({
             return {top: 0, left: 0};
         }
     }
+});
+
+// ログイン必須設定のキャッシュ
+// 初回アクセス時にサーバー設定を取得してキャッシュし、以降はキャッシュを利用する
+let require_login_checked = false;
+let require_login = false;
+
+// ログイン必須設定が有効な場合、未ログインユーザーをログインページにリダイレクトするガード
+router.beforeEach(async (to, from, next) => {
+
+    // ログイン / 登録ページは常にアクセス可能
+    if (to.path === '/login/' || to.path === '/register/') {
+        next();
+        return;
+    }
+
+    // 初回のみサーバー設定を取得してキャッシュする
+    if (!require_login_checked) {
+        const settings = await Settings.fetchServerSettings();
+        if (settings) {
+            require_login = settings.server.require_login;
+        }
+        require_login_checked = true;
+    }
+
+    // ログイン必須設定が有効な場合、未ログインならログインページにリダイレクト
+    if (require_login) {
+        const user_store = useUserStore();
+        if (!user_store.is_logged_in) {
+            // アクセストークンがあればユーザー情報を取得してログイン状態を復元する
+            if (Utils.getAccessToken() !== null) {
+                await user_store.fetchUser();
+            }
+            // ログイン状態の復元に失敗した場合、ログインページにリダイレクト
+            if (!user_store.is_logged_in) {
+                next({ path: '/login/', query: { redirect: to.fullPath } });
+                return;
+            }
+        }
+    }
+
+    next();
 });
 
 // ルーティングの変更時に View Transitions API を適用する

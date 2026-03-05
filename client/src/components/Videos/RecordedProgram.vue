@@ -115,6 +115,12 @@
                             </template>
                             <v-list-item-title class="ml-3">サムネイルを再生成</v-list-item-title>
                         </v-list-item>
+                        <v-list-item v-if="forSeries" @click="show_remove_from_series = true">
+                            <template v-slot:prepend>
+                                <Icon icon="fluent:subtract-circle-24-regular" width="20px" height="20px" />
+                            </template>
+                            <v-list-item-title class="ml-3">シリーズから除外</v-list-item-title>
+                        </v-list-item>
                         <v-divider></v-divider>
                         <v-list-item @click="showDeleteConfirmation" :disabled="program.recorded_video.status === 'Recording'" class="recorded-program__menu-list-item--danger">
                             <template v-slot:prepend>
@@ -153,6 +159,30 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+
+    <!-- シリーズ除外確認ダイアログ -->
+    <v-dialog max-width="550" v-model="show_remove_from_series">
+        <v-card>
+            <v-card-title class="d-flex justify-center pt-6 font-weight-bold">シリーズから除外しますか？</v-card-title>
+            <v-card-text class="pt-2 pb-0">
+                <div class="text-center">
+                    この番組をシリーズから除外します。<br>
+                    除外された番組はサーバー再起動後も自動で再割り当てされません。
+                </div>
+            </v-card-text>
+            <v-card-actions class="pt-4 px-6 pb-6">
+                <v-spacer></v-spacer>
+                <v-btn color="text" variant="text" @click="show_remove_from_series = false">
+                    <Icon icon="fluent:dismiss-20-regular" width="18px" height="18px" />
+                    <span class="ml-1">キャンセル</span>
+                </v-btn>
+                <v-btn class="px-3" color="primary" variant="flat" @click="removeFromSeries">
+                    <Icon icon="fluent:subtract-circle-20-regular" width="18px" height="18px" />
+                    <span class="ml-1">除外する</span>
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 <script lang="ts" setup>
 
@@ -160,6 +190,7 @@ import { ref, computed } from 'vue';
 
 import RecordedFileInfoDialog from '@/components/Videos/Dialogs/RecordedFileInfoDialog.vue';
 import Message from '@/message';
+import SeriesService from '@/services/Series';
 import Videos, { IRecordedProgram } from '@/services/Videos';
 import useSettingsStore from '@/stores/SettingsStore';
 import useUserStore from '@/stores/UserStore';
@@ -170,20 +201,27 @@ const props = withDefaults(defineProps<{
     program: IRecordedProgram;
     forMylist?: boolean;
     forWatchedHistory?: boolean;
+    forSeries?: boolean;
+    seriesId?: number;
 }>(), {
     forMylist: false,
     forWatchedHistory: false,
+    forSeries: false,
+    seriesId: 0,
 });
 
 // Emits
 const emit = defineEmits<{
     (e: 'deleted', id: number): void;
+    (e: 'removedFromSeries', id: number): void;
 }>();
 
 // ファイル情報ダイアログの表示状態
 const show_video_info = ref(false);
 // 削除確認ダイアログの表示状態
 const show_delete_confirmation = ref(false);
+// シリーズ除外確認ダイアログの表示状態
+const show_remove_from_series = ref(false);
 
 // 録画ファイルのダウンロード (location.href を変更し、ダウンロード自体はブラウザに任せる)
 const downloadVideo = () => {
@@ -271,6 +309,17 @@ const deleteVideo = async () => {
         Message.success('録画ファイルを削除しました。');
         // 親コンポーネントに削除イベントを発行
         emit('deleted', props.program.id);
+    }
+};
+
+// シリーズから除外
+const removeFromSeries = async () => {
+    show_remove_from_series.value = false;
+    const result = await SeriesService.removeProgramFromSeries(props.seriesId, props.program.id);
+    if (result === true) {
+        Message.success('シリーズから除外しました。');
+        // 親コンポーネントに除外イベントを発行
+        emit('removedFromSeries', props.program.id);
     }
 };
 
