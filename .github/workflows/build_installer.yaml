@@ -6,7 +6,7 @@ name: Build Installer
 on:
   push:
     branches:
-      - master
+      - custom-features
     paths:
       - 'installer/**'
       - '.github/workflows/build_installer.yaml'

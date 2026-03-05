@@ -39,7 +39,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git switch master
+          git switch custom-features
 
           # ソースコードやドキュメント内のバージョンを更新
           sed -i -e 's|"version": ".*",|"version": "${{ github.event.inputs.version }}",|' client/package.json
@@ -59,12 +59,12 @@ jobs:
           # リリースコミットを作成
           git add .
           git commit -m 'Release: version ${{ github.event.inputs.version }}'
-          git push -u origin master
+          git push -u origin custom-features
 
-      # release ブランチを現在の master ブランチの最新コミット (リリースコミット) に更新する
+      # release ブランチを現在の custom-features ブランチの最新コミット (リリースコミット) に更新する
       ## release ブランチはリリースしたときのみ更新される
       - name: Update Release Branch
         run: |
           git switch release
-          git merge master
+          git merge custom-features
           git push -u origin release
