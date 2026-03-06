@@ -239,9 +239,9 @@ export default defineComponent({
                 }
                 &--active {
                     color: rgb(var(--v-theme-primary));
-                    background: #5b2d3c;
+                    background: rgba(var(--v-theme-primary), 0.15);
                     &:hover {
-                        background: #5b2d3c;
+                        background: rgba(var(--v-theme-primary), 0.15);
                     }
                 }
                 &--highlight {

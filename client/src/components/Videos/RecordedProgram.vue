@@ -421,7 +421,7 @@ const removeFromSeries = async () => {
             font-weight: 700;
             line-height: 1;
             background: rgba(var(--v-theme-background-lighten-1), 0.9);
-            color: rgba(255, 255, 255, 0.85);
+            color: rgb(var(--v-theme-text));
 
             &--analyzing {
                 gap: 3px;
