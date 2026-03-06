@@ -77,7 +77,7 @@ export default defineComponent({
     // その間下に何も背景がない部分ができてしまうのを防ぐ
     bottom: -100px;
     padding: 18px 8px 122px;
-    background: rgba(var(--v-theme-background-lighten-1), 0.5);
+    background: #2F221F80;
     transition: opacity 0.3s, visibility 0.3s;
     opacity: 0;
     visibility: hidden;
@@ -138,7 +138,7 @@ export default defineComponent({
         }
 
         &:hover {
-            background: rgba(var(--v-theme-background-lighten-2), 0.63);
+            background: #433532A0;
         }
 
         @include smartphone-horizontal {
@@ -150,7 +150,7 @@ export default defineComponent({
 
         &--active {
             color: rgb(var(--v-theme-primary));
-            background: rgba(var(--v-theme-primary), 0.15);
+            background: #433532A0;
         }
         + .watch-navigation__link {
             margin-top: 4px;

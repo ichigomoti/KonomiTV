@@ -649,7 +649,7 @@ _::-webkit-full-page-media, _:future, :root .dplayer-icon:hover .dplayer-icon-co
             width: 48px;
             height: 48px;
             color: rgb(var(--v-theme-text));
-            background: rgba(var(--v-theme-background-lighten-1), 0.75);
+            background: #2F221FC0;
             border-radius: 7px;
             transition: background-color 0.15s;
             user-select: none;
@@ -666,12 +666,12 @@ _::-webkit-full-page-media, _:future, :root .dplayer-icon:hover .dplayer-icon-co
             }
 
             &:hover {
-                background: rgba(var(--v-theme-background-lighten-1), 0.94);
+                background: #2F221FF0;
             }
             // タッチデバイスで hover を無効にする
             @media (hover: none) {
                 &:hover {
-                    background: rgba(var(--v-theme-background-lighten-1), 0.75);
+                    background: #2F221FC0;
                 }
             }
 
