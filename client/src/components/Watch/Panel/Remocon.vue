@@ -87,7 +87,7 @@ export default defineComponent({
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(30, 19, 16, 50%);
+    background: rgba(var(--v-theme-background), 0.5);
     transition: opacity 0.2s, visibility 0.2s;
     overflow-y: scroll;
     opacity: 0;
