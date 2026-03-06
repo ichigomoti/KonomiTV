@@ -1036,7 +1036,7 @@ export default defineComponent({
     &__text {
         margin-left: 8px;
         margin-right: 2px;
-        color: #FFEAEA;
+        color: rgb(var(--v-theme-text));
         font-size: 16px;
         font-weight: 500;
     }

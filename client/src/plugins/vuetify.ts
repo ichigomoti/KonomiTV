@@ -263,6 +263,16 @@ const vuetify = createVuetify({
  */
 export function applyThemeMode(mode: 'Light' | 'Dark'): void {
     vuetify.theme.global.name.value = mode === 'Light' ? 'light' : 'dark';
+    // PWA のステータスバー色と body の背景色をテーマに合わせて更新する
+    const themeName = mode === 'Light' ? 'light' : 'dark';
+    const bgColor = vuetify.theme.themes.value[themeName].colors.background;
+    const textColor = vuetify.theme.themes.value[themeName].colors.text;
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+        themeColorMeta.setAttribute('content', bgColor);
+    }
+    document.body.style.background = bgColor;
+    document.body.style.color = textColor;
 }
 
 
