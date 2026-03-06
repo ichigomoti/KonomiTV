@@ -94,6 +94,29 @@ KonomiTV にアクセスする際にログインを必須にするサーバー�
 - **動作**: 有効時、未ログインユーザーはすべてのページでログイン画面にリダイレクトされる
 - **リダイレクト対応**: ログイン後、元々アクセスしようとしていたページに自動的に戻る
 
+### 6. テーマ機能（ライト/ダークモード・アクセントカラー）
+
+設定画面からテーマモードとアクセントカラーを切り替えられるようになりました。
+
+#### テーマモード
+- **ダークモード**（デフォルト）: 本家と同じダークテーマ
+- **ライトモード**: 背景色がニュートラルな白色（`#f5f5f5`）のライトテーマ
+  - サイドバー・ナビゲーションのアクティブ項目がテーマ色に合わせて自動的に変化
+  - ヘッダーの KonomiTV ロゴがライトモード用の暗色テキストに自動切り替え
+  - 録画番組サムネイルのステータスバッジ（「メタデータ解析中」等）がテーマに合わせた文字色で表示
+
+#### アクセントカラー
+9種類のプリセットカラーから UI 全体のアクセントカラーを変更できます:
+
+ピンク（デフォルト）/ レッド / オレンジ / アンバー / グリーン / ティール / ブルー / インディゴ / パープル
+
+### 7. モバイルレスポンシブ対応
+
+シリーズ一覧・シリーズ詳細画面をスマートフォン縦画面で快適に使えるようにレイアウトを最適化しました。
+
+- **シリーズ詳細**: タイトルとアクションボタンが2行に分かれて表示、エピソード件数も画面内に収まる
+- **シリーズ一覧**: タイトル行とアクション行が2段に折り返し、「シリーズ一覧」テキストが改行されない
+
 ---
 
 ## 追加・拡張した API
@@ -164,8 +187,18 @@ KonomiTV にアクセスする際にログインを必須にするサーバー�
 | `client/src/services/Captures.ts` | キャプチャ API クライアント（アップロード・フォルダ CRUD） |
 | `client/src/services/Series.ts` | シリーズ API クライアント (CRUD + マージ) |
 | `client/src/services/Settings.ts` | `require_login` フィールド追加 |
+| `client/src/views/Settings/General.vue` | テーマモード・アクセントカラー設定 UI の追加 |
 | `client/src/views/Settings/Server.vue` | ログイン必須設定の v-switch 追加 |
 | `client/src/services/player/managers/CaptureManager.ts` | EXIF メタデータ埋め込み・サーバーアップロード対応 |
+| `client/src/plugins/vuetify.ts` | ライトテーマ定義・アクセントカラープリセット・動的テーマ切り替え関数 |
+| `client/src/stores/SettingsStore.ts` | テーマモード・アクセントカラー設定フィールドの追加 |
+| `client/src/main.ts` | テーマ初期化・設定変更時のテーマ即時反映 |
+| `client/src/components/HeaderBar.vue` | テーマに応じたロゴ画像の動的切り替え |
+| `client/src/components/SPHeaderBar.vue` | テーマに応じたロゴ画像の動的切り替え |
+| `client/src/components/Navigation.vue` | サイドバーのアクティブ項目色をテーマ対応に変更 |
+| `client/src/components/Videos/RecordedProgram.vue` | サムネイルバッジのテキスト色をテーマ対応に変更 |
+| `client/src/App.vue` | テキスト選択色をテーマ変数に変更 |
+| `client/public/assets/images/logo-light.svg` | **[新規]** ライトモード用ロゴ画像 |
 | `client/src/router/index.ts` | キャプチャギャラリールート追加・ログイン必須 `beforeEach` ガード追加 |
 | `client/src/views/Login.vue` | リダイレクト対応 |
 | `client/src/components/Videos/RecordedProgramList.vue` | シリーズ向け表示対応 |
