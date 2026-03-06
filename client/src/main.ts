@@ -12,7 +12,7 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import App from '@/App.vue';
 import Message from '@/message';
 import FloatingVue from '@/plugins/floating-vue';
-import vuetify from '@/plugins/vuetify';
+import vuetify, { applyAccentColor, applyThemeMode } from '@/plugins/vuetify';
 import router from '@/router';
 import useSettingsStore, {
     getLocalStorageSettings,
@@ -59,6 +59,19 @@ app.use(FloatingVue);
 // マウントを実行
 app.mount('#app');
 
+// ***** テーマ設定の適用 *****
+
+// 保存されているテーマ設定を起動時に適用する
+// Pinia ストアの初期化は app.mount() の後に行う必要があるため、ここで適用する
+{
+    const settings_store_for_theme = useSettingsStore();
+    applyThemeMode(settings_store_for_theme.settings.theme_mode);
+    applyAccentColor(
+        settings_store_for_theme.settings.accent_color_primary,
+        settings_store_for_theme.settings.accent_color_secondary,
+    );
+}
+
 // ***** Service Worker のイベントを登録 *****
 
 const { updateServiceWorker } = useRegisterSW({
@@ -92,6 +105,13 @@ const { updateServiceWorker } = useRegisterSW({
 const settings_store = useSettingsStore();
 let is_updating_watched_history = false;
 settings_store.$subscribe(async () => {
+
+    // テーマ設定の変更を即座に反映する
+    applyThemeMode(settings_store.settings.theme_mode);
+    applyAccentColor(
+        settings_store.settings.accent_color_primary,
+        settings_store.settings.accent_color_secondary,
+    );
 
     // 視聴履歴の保持件数を変更した際に、既存の視聴履歴件数が上限を超えている場合は即時に古い履歴から削除する
     // これにより、履歴追加時だけでなく設定値の縮小時にも常に上限件数を維持できる

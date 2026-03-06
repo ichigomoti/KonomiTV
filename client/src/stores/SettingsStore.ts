@@ -35,7 +35,14 @@ export interface ITimeTableGenreColors {
  * LocalStorage に保存される KonomiTV の設定データ
  * IClientSettings とは異なり、同期対象外の設定キーも含まれる
  */
+// テーマモードの型定義
+export type ThemeMode = 'Light' | 'Dark';
+
 export interface ILocalClientSettings extends IClientSettings {
+    // テーマ設定
+    theme_mode: ThemeMode;
+    accent_color_primary: string;
+    accent_color_secondary: string;
     last_synced_at: number;
     showed_panel_last_time: boolean;
     selected_twitter_account_id: number | null;
@@ -123,6 +130,14 @@ export interface ILocalClientSettings extends IClientSettings {
  * 以下の設定は、必ず UI 上の表示順序通りに記述しなければならない
  */
 export const ILocalClientSettingsDefault: ILocalClientSettings = {
+
+    // ***** テーマ設定 *****
+
+    // テーマモード (Default: ダーク)
+    theme_mode: 'Dark',
+    // アクセントカラー (Default: ピンク)
+    accent_color_primary: '#e64f97',
+    accent_color_secondary: '#e33157',
 
     // ***** 設定画面から直接変更できない設定値 *****
 

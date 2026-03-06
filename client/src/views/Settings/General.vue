@@ -10,6 +10,33 @@
         </h2>
         <div class="settings__content">
             <div class="settings__item">
+                <div class="settings__item-heading">テーマモード</div>
+                <div class="settings__item-label">
+                    ライトテーマとダークテーマを切り替えられます。デフォルトはダークテーマです。<br>
+                </div>
+                <v-select class="settings__item-form" color="primary" variant="outlined" hide-details
+                    :density="is_form_dense ? 'compact' : 'default'"
+                    :items="theme_mode_items" v-model="settingsStore.settings.theme_mode">
+                </v-select>
+            </div>
+            <div class="settings__item">
+                <div class="settings__item-heading">アクセントカラー</div>
+                <div class="settings__item-label">
+                    UI 全体のアクセントカラーを変更できます。デフォルトはピンクです。<br>
+                </div>
+                <div class="settings__accent-color-presets mt-3">
+                    <div v-for="preset in ACCENT_COLOR_PRESETS" :key="preset.name"
+                        class="settings__accent-color-preset"
+                        :class="{'settings__accent-color-preset--active': settingsStore.settings.accent_color_primary === preset.primary}"
+                        :style="{background: preset.primary}"
+                        @click="applyAccentColorPreset(preset)">
+                        <Icon v-if="settingsStore.settings.accent_color_primary === preset.primary"
+                            icon="fluent:checkmark-16-filled" width="20px" color="white" />
+                    </div>
+                </div>
+            </div>
+            <v-divider class="mt-6"></v-divider>
+            <div class="settings__item">
                 <div class="settings__item-heading">ピン留め中チャンネルの並び替え</div>
                 <div class="settings__item-label">
                     ピン留め中のチャンネルの表示順序を変更できます。よくみるチャンネルは先頭に配置しておくと便利です。<br>
@@ -204,6 +231,7 @@ import { defineComponent } from 'vue';
 import PinnedChannelSettings from '@/components/Settings/PinnedChannelSettings.vue';
 import TimeTableSettingsDialog from '@/components/Settings/TimeTableSettings.vue';
 import Message from '@/message';
+import { ACCENT_COLOR_PRESETS, type AccentColorPreset } from '@/plugins/vuetify';
 import useSettingsStore from '@/stores/SettingsStore';
 import Utils from '@/utils';
 import SettingsBase from '@/views/Settings/Base.vue';
@@ -221,8 +249,17 @@ export default defineComponent({
             // ユーティリティをテンプレートで使えるように
             Utils: Object.freeze(Utils),
 
+            // アクセントカラーのプリセット
+            ACCENT_COLOR_PRESETS: ACCENT_COLOR_PRESETS,
+
             // フォームを小さくするかどうか
             is_form_dense: Utils.isSmartphoneHorizontal(),
+
+            // テーマモードの選択肢
+            theme_mode_items: [
+                {title: 'ダークテーマ', value: 'Dark'},
+                {title: 'ライトテーマ', value: 'Light'},
+            ],
 
             // ピン留め中チャンネルの並び替え設定のモーダルを表示するか
             pinned_channel_settings_modal: false,
@@ -261,6 +298,12 @@ export default defineComponent({
         ...mapStores(useSettingsStore),
     },
     methods: {
+
+        // アクセントカラーのプリセットを適用する
+        applyAccentColorPreset(preset: AccentColorPreset) {
+            this.settingsStore.settings.accent_color_primary = preset.primary;
+            this.settingsStore.settings.accent_color_secondary = preset.secondary;
+        },
 
         // 設定データをエクスポートする
         exportSettings() {
@@ -303,3 +346,33 @@ export default defineComponent({
 });
 
 </script>
+<style lang="scss" scoped>
+
+.settings__accent-color-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .settings__accent-color-preset {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border: 3px solid transparent;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &--active {
+            border-color: rgb(var(--v-theme-text));
+            box-shadow: 0 0 0 2px rgb(var(--v-theme-background-lighten-1));
+        }
+    }
+}
+
+</style>

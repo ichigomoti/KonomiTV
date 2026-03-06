@@ -42,9 +42,9 @@ import Snackbars from '@/components/Snackbars.vue';
     -webkit-tap-highlight-color: transparent;
 }
 
-// 選択時の色
+// 選択時の色 (アクセントカラーに連動)
 *::selection {
-	background-color: #E64F9780;
+	background-color: rgba(var(--v-theme-primary), 0.5);
 }
 
 // リンクの既定の CSS をリセット

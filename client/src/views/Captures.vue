@@ -12,6 +12,17 @@
                         <h2 class="captures__title">
                             <span class="captures__title-text">{{ pageTitle }}</span>
                             <div class="captures__title-count" v-if="total > 0">{{ total }}件</div>
+                            <!-- フォルダ表示時: 名前変更・削除ボタン -->
+                            <template v-if="active_folder_id !== null">
+                                <v-btn class="captures__title-action ml-2" variant="flat" color="background-lighten-2"
+                                    size="small" @click="openRenameFolderDialogForActive()">
+                                    <Icon icon="fluent:rename-20-filled" width="18px" />
+                                </v-btn>
+                                <v-btn class="captures__title-action ml-1" variant="flat" color="background-lighten-2"
+                                    size="small" @click="openDeleteFolderDialogForActive()">
+                                    <Icon icon="fluent:delete-20-filled" width="18px" />
+                                </v-btn>
+                            </template>
                         </h2>
                         <div class="captures__actions">
                             <v-select class="captures__sort" color="primary" bg-color="background-lighten-1"
@@ -612,6 +623,22 @@ const openDeleteFolderDialog = () => {
     delete_folder_dialog_open.value = true;
 };
 
+// ヘッダーボタンから名前変更ダイアログを開く (アクティブなフォルダを対象にする)
+const openRenameFolderDialogForActive = () => {
+    const folder = folders.value.find(f => f.id === active_folder_id.value);
+    if (!folder) return;
+    target_folder.value = folder;
+    openRenameFolderDialog();
+};
+
+// ヘッダーボタンから削除ダイアログを開く (アクティブなフォルダを対象にする)
+const openDeleteFolderDialogForActive = () => {
+    const folder = folders.value.find(f => f.id === active_folder_id.value);
+    if (!folder) return;
+    target_folder.value = folder;
+    openDeleteFolderDialog();
+};
+
 // フォルダ削除を実行する
 const executeDeleteFolder = async () => {
     if (!target_folder.value) return;
@@ -821,6 +848,14 @@ onMounted(async () => {
         font-size: 14px;
         font-weight: 400;
         color: rgb(var(--v-theme-text-darken-1));
+    }
+
+    &-action {
+        min-width: 36px !important;
+        width: 36px;
+        height: 36px;
+        padding: 0 !important;
+        border-radius: 8px;
     }
 }
 
