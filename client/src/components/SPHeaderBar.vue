@@ -2,7 +2,7 @@
     <header class="header" :class="{ 'search-active': isSearchActive, 'header--hide-on-sp-vertical': hideOnSmartphoneVertical }">
         <template v-if="!isSearchActive">
             <router-link v-ripple class="konomitv-logo" to="/tv/">
-                <img class="konomitv-logo__image" src="/assets/images/logo.svg" height="21">
+                <img class="konomitv-logo__image" :src="logoSrc" height="21">
             </router-link>
             <v-spacer></v-spacer>
             <!-- 番組表コントロール用スロット -->
@@ -30,6 +30,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
+import useSettingsStore from '@/stores/SettingsStore';
+
 // Props の定義
 const { hideOnSmartphoneVertical = false } = defineProps<{
     // スマホ縦画面で非表示にするかどうか
@@ -39,6 +41,14 @@ const { hideOnSmartphoneVertical = false } = defineProps<{
 
 const router = useRouter();
 const route = useRoute();
+const settingsStore = useSettingsStore();
+
+// テーマモードに応じてロゴ画像を切り替える
+const logoSrc = computed(() => {
+    return settingsStore.settings.theme_mode === 'Light'
+        ? '/assets/images/logo-light.svg'
+        : '/assets/images/logo.svg';
+});
 
 // 検索入力フィールドの参照
 const searchInput = ref<HTMLInputElement | null>(null);

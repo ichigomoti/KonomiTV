@@ -1,7 +1,7 @@
 <template>
     <header class="header">
         <router-link v-ripple class="konomitv-logo ml-3 ml-md-6" to="/tv/">
-            <img class="konomitv-logo__image" src="/assets/images/logo.svg" height="21">
+            <img class="konomitv-logo__image" :src="logoSrc" height="21">
         </router-link>
         <v-spacer></v-spacer>
         <!-- 番組表コントロール用スロット -->
@@ -25,10 +25,20 @@ import { pwaInstallHandler } from 'pwa-install-handler';
 import { onMounted, ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
+import useSettingsStore from '@/stores/SettingsStore';
+
 const isButtonDisplay = ref(false);
 const searchQuery = ref('');
 const router = useRouter();
 const route = useRoute();
+const settingsStore = useSettingsStore();
+
+// テーマモードに応じてロゴ画像を切り替える
+const logoSrc = computed(() => {
+    return settingsStore.settings.theme_mode === 'Light'
+        ? '/assets/images/logo-light.svg'
+        : '/assets/images/logo.svg';
+});
 
 // 検索クエリの初期化関数
 const initializeSearchQuery = () => {
