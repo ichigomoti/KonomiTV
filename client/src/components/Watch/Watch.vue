@@ -32,6 +32,7 @@ import LShapedScreenCropSettings from '@/components/Watch/LShapedScreenCropSetti
 import WatchNavigation from '@/components/Watch/Navigation.vue';
 import WatchPanel from '@/components/Watch/Panel.vue';
 import WatchPlayer from '@/components/Watch/Player.vue';
+import { applyThemeMode } from '@/plugins/vuetify';
 import usePlayerStore from '@/stores/PlayerStore';
 import useSettingsStore from '@/stores/SettingsStore';
 import Utils from '@/utils';
@@ -73,6 +74,9 @@ export default defineComponent({
     // 開始時に実行
     created() {
 
+        // 視聴画面では常にダークテーマを使用する (動画視聴時はダークテーマの方が見やすいため)
+        applyThemeMode('Dark');
+
         // Virtual Keyboard API に対応している場合は、仮想キーボード周りの操作を自力で行うことをブラウザに伝える
         // この視聴画面のみ
         if ('virtualKeyboard' in navigator) {
@@ -93,6 +97,9 @@ export default defineComponent({
     },
     // 終了前に実行
     beforeUnmount() {
+
+        // 視聴画面を離れる際に、ユーザーが設定しているテーマモードに戻す
+        applyThemeMode(this.settingsStore.settings.theme_mode);
 
         // PlayerStore に視聴画面を閉じたことを伝える
         this.playerStore.stopWatching();

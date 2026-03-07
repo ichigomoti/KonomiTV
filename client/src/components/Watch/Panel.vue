@@ -346,10 +346,10 @@ export default defineComponent({
                     color: rgb(var(--v-theme-primary));
                 }
                 @include tablet-vertical {
-                    background: rgba(var(--v-theme-primary), 0.15);
+                    background: #5b2d3c;
                 }
                 @include smartphone-vertical {
-                    background: rgba(var(--v-theme-primary), 0.15);
+                    background: #5b2d3c;
                 }
             }
 

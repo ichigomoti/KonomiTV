@@ -210,7 +210,7 @@ function clickCapture(capture: ITweetCapture) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(var(--v-theme-background), 0.5);
+            background: rgba(30, 19, 16, 50%);
         }
 
         &__selected-number {
@@ -222,7 +222,7 @@ function clickCapture(capture: ITweetCapture) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(var(--v-theme-background), 0.5);
+            background: rgba(30, 19, 16, 50%);
             font-size: 38px;
             text-shadow: 0px 0px 2.5px rgba(0, 0, 0, 90%)
         }
